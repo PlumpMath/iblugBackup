@@ -34,12 +34,14 @@ class BatchDownloader():
                 try:
                     playerDoc = urlopen(urlpre + f).readall().decode(errors='ignore')
                     furl = re.search(playerDoc).group()
-                    title = fre.search(playerDoc).group().strip().unescape()
+                    title = unescape(fre.search(playerDoc).group().strip())
                     fname = title.replace('?','？').replace('<','[').replace('>',']').replace('*','.').replace('"',"'") + splitext(furl)[1]
                     for c in '\\/:*?"<>|': fname = fname.replace(c,'') # replace characters that are not applicable for file name # possible future replacement = '__;_!\'()l'
                     fpath=join(downpath, fname)
                     if not exists(fpath):
                         urlretrieve(furl, fpath)
+                    # else:
+                        # return
                     done=True
                 except HTTPError as e:
                     print(e.code, e.msg)
@@ -49,6 +51,6 @@ class BatchDownloader():
         log.close()
 
 if __name__ == '__main__':
-    channel='sciencewithpeople'#'birdfly'
+    channel='birdfly' #'sciencewithpeople'
     BatchDownloader('http://%s.iblug.com/index.jsp?limit_num=999999999' % channel, '(?<=png"  onClick="fn_listen\(\'/podcast/aplayer_jw.jsp\?lecture_cd=)[^\'"&]+') \
         .run('http://%s.iblug.com/podcast/aplayer_jw.jsp?lecture_cd=' % channel, '(?<=file: \')[^\']+', '(?<=class="title">)[^<]+', 'E:\\iblug_backup\\%s' % channel)
