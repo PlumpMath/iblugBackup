@@ -51,30 +51,32 @@ class BatchDownloader():
                             urlretrieve(furl, 'tmp')
                             furl = split(furl)[0]
                             indexFname=''
-                            with open('tmp') as f:
+                            with open('tmp') as file:
                                 line=''
-                                while not line.startswith('index'): line = f.readline()
+                                while not line.startswith('index'): line = file.readline()
                                 indexFname=line
                             urlretrieve('/'.join((furl,indexFname)), 'tmp')
                             segments=[]
-                            with open('tmp') as f:
+                            with open('tmp') as file:
                                 line=' '
                                 while line != '':
-                                    line = f.readline()
+                                    line = file.readline()
                                     if line.startswith('segment'): segments.append(line)
                             for segment in segments:
                                 urlretrieve('/'.join((furl,segment)), 'tmp')
-                                with open('tmp','rb') as f, open(fpath,'ab') as w:
+                                with open('tmp','rb') as file, open(fpath,'ab') as w:
                                     tmp=b' '
                                     while tmp != b'':
-                                        tmp = f.read(1)
+                                        tmp = file.read(1)
                                         w.write(tmp)
                         done=True
                 except HTTPError as e:
                     print(e.code, e.msg)
                     sleep(3)
             print(furl, '=',title,'saved as' if done is True else 'already exists as', fname)
-            if done is True: log.write(furl+'\t'+title+'\t\t\t\t'+fname+'\n')
+            if done is True:
+                log.write(furl+'\t'+title+'\t\t\t\t'+fname+'\n')
+                log.flush()
         log.close()
 
 if __name__ == '__main__':
