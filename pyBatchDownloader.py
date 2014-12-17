@@ -30,6 +30,8 @@ class BatchDownloader():
     def _run(self,urlpre,fileUrlRE,downpath):
         log=open(join(downpath, 'fileList.txt'), 'a')
         for t,f,title in self._find:
+            while unescape(title)!=title:
+                title=unescape(title)
             done=False
             furl,fname='',''
             while done==False:
@@ -37,7 +39,7 @@ class BatchDownloader():
                     playerDoc = urlopen(urlpre.format(t) + f).readall().decode(errors='ignore')
                     furl = fileUrlRE.search(playerDoc).group()
                      # title = unescape(titleRE.search(playerDoc).group().strip())
-                    fname = unescape(title).replace('?','？').replace('<','[').replace('>',']').replace('*','.').replace('"',"'") + splitext(furl if not t=='v' else split(furl)[0])[1]
+                    fname = unescape(title.strip()).replace('?','？').replace('<','[').replace('>',']').replace('*','.').replace('"',"'") + splitext(furl if not t=='v' else split(furl)[0])[1]
                     for c in '\\/:*?"<>|': fname = fname.replace(c,'') # replace characters that are not applicable for file name # possible future replacement = '__;_!\'()l'
                     fpath = join(downpath, fname)
                     if exists(fpath):
