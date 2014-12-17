@@ -32,13 +32,12 @@ class BatchDownloader():
         for t,f,title in self._find:
             done=False
             furl,fname='',''
-            while not done:
+            while done==False:
                 try:
                     playerDoc = urlopen(urlpre.format(t) + f).readall().decode(errors='ignore')
                     furl = fileUrlRE.search(playerDoc).group()
-                    title = unescape(title)
                      # title = unescape(titleRE.search(playerDoc).group().strip())
-                    fname = title.replace('?','？').replace('<','[').replace('>',']').replace('*','.').replace('"',"'") + splitext(furl if not t=='v' else split(furl)[0])[1]
+                    fname = unescape(title).replace('?','？').replace('<','[').replace('>',']').replace('*','.').replace('"',"'") + splitext(furl if not t=='v' else split(furl)[0])[1]
                     for c in '\\/:*?"<>|': fname = fname.replace(c,'') # replace characters that are not applicable for file name # possible future replacement = '__;_!\'()l'
                     fpath = join(downpath, fname)
                     if exists(fpath):
@@ -61,7 +60,6 @@ class BatchDownloader():
                                 while line != '':
                                     line = f.readline()
                                     if line.startswith('segment'): segments.append(line)
-                                indexFname=line
                             for segment in segments:
                                 urlretrieve('/'.join((furl,segment)), 'tmp')
                                 with open('tmp','rb') as f, open(fpath,'ab') as w:
@@ -69,7 +67,7 @@ class BatchDownloader():
                                     while tmp != b'':
                                         tmp = f.read(1)
                                         w.write(tmp)
-                    done=True
+                        done=True
                 except HTTPError as e:
                     print(e.code, e.msg)
                     sleep(3)
